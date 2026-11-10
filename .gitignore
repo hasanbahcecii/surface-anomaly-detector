@@ -1,0 +1,19 @@
+# Data & artifacts (big, reproducible from scripts)
+data/*
+!data/.gitkeep
+runs/
+*.pt
+*.onnx
+*.engine
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# Secrets
+kaggle.json
+.env
