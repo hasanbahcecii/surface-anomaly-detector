@@ -23,7 +23,8 @@ set the runtime to T4 GPU, add `KAGGLE_USERNAME` / `KAGGLE_KEY` as Colab secrets
 
 ```
 scripts/prepare_data.py   SDNET2018 -> YOLO-cls train/val/test folders
-scripts/evaluate.py       per-class precision / recall / F1 on a split
+scripts/evaluate.py       per-class precision / recall / F1 on a split (optional --threshold)
+scripts/tune_threshold.py pick the cracked-class threshold on val, report on test
 notebooks/                Colab notebooks
 data/                     (gitignored) raw + processed data
 ```

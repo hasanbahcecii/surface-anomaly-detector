@@ -7,7 +7,7 @@
 - [x] Target: **cracked-class F1 > 0.75** on test — achieved **0.814** (P 0.905 / R 0.740)
       (SDNET2018 has no boxes, so mAP@0.5 is not measurable; F1 replaces it)
 - [x] First commit: data prep script + notebook
-- [ ] Follow-up: tune decision threshold for higher crack recall
+- [ ] Tune decision threshold for higher crack recall — `scripts/tune_threshold.py` (notebook §7), awaiting Colab run
 
 ## v0.2 — Model Optimization
 - [ ] ONNX export
