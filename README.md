@@ -16,7 +16,8 @@ Split: 70 / 15 / 15, stratified by surface × label, seed 42 (`data/processed/sp
 
 ## Training (Google Colab)
 
-All training runs on Colab — open [`notebooks/01_train_baseline_colab.ipynb`](notebooks/01_train_baseline_colab.ipynb),
+All training runs on Colab — open [`notebooks/01_train_baseline_colab.ipynb`](notebooks/01_train_baseline_colab.ipynb)
+(baseline) or [`notebooks/02_improve_recall_colab.ipynb`](notebooks/02_improve_recall_colab.ipynb) (v2: 256px + cracked oversampling),
 set the runtime to T4 GPU, add `KAGGLE_USERNAME` / `KAGGLE_KEY` as Colab secrets, and run all cells.
 
 ## Repo layout
@@ -25,6 +26,7 @@ set the runtime to T4 GPU, add `KAGGLE_USERNAME` / `KAGGLE_KEY` as Colab secrets
 scripts/prepare_data.py   SDNET2018 -> YOLO-cls train/val/test folders
 scripts/evaluate.py       per-class precision / recall / F1 on a split (optional --threshold)
 scripts/tune_threshold.py pick the cracked-class threshold on val, report on test
+scripts/show_errors.py    image grids of the worst missed cracks / false alarms
 notebooks/                Colab notebooks
 data/                     (gitignored) raw + processed data
 ```

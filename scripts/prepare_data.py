@@ -12,10 +12,14 @@ Output (Ultralytics classification layout):
     <out>/split_manifest.csv   # reproducible record of every file's split
 
 The split is stratified by (surface, label) so each split keeps the same mix of
-decks/pavements/walls and the same crack ratio.
+decks/pavements/walls and the same crack ratio. --oversample-cracked K writes each
+cracked *train* image K times (val/test untouched) to counter the ~15% crack ratio;
+augmentation makes the copies differ at train time. The split itself does not
+depend on K, so val/test are identical across K for the same seed.
 
 Usage:
     python scripts/prepare_data.py --src data/raw --out data/processed
+    python scripts/prepare_data.py --src data/raw --out data/processed_os2 --oversample-cracked 2
 """
 
 from __future__ import annotations
@@ -103,10 +107,13 @@ def main() -> None:
     ap.add_argument("--ratios", type=float, nargs=3, default=(0.70, 0.15, 0.15), metavar=("TRAIN", "VAL", "TEST"))
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--link", action="store_true", help="symlink instead of copying (saves disk)")
+    ap.add_argument("--oversample-cracked", type=int, default=1, metavar="K", help="copies of each cracked train image")
     args = ap.parse_args()
 
     if abs(sum(args.ratios) - 1.0) > 1e-6:
         ap.error("ratios must sum to 1")
+    if args.oversample_cracked < 1:
+        ap.error("--oversample-cracked must be >= 1")
 
     samples = collect(args.src)
     if not samples:
@@ -119,13 +126,16 @@ def main() -> None:
     manifest_rows = []
     for split, items in splits.items():
         for path, surface, label in items:
-            dst = args.out / split / label / f"{surface}_{path.name}"
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            if args.link:
-                os.symlink(path.resolve(), dst)
-            else:
-                shutil.copy2(path, dst)
-            manifest_rows.append((split, label, surface, str(path.relative_to(args.src)), str(dst.relative_to(args.out))))
+            copies = args.oversample_cracked if split == "train" and label == "cracked" else 1
+            for k in range(copies):
+                suffix = f"_dup{k}" if k else ""
+                dst = args.out / split / label / f"{surface}_{path.stem}{suffix}{path.suffix}"
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                if args.link:
+                    os.symlink(path.resolve(), dst)
+                else:
+                    shutil.copy2(path, dst)
+                manifest_rows.append((split, label, surface, str(path.relative_to(args.src)), str(dst.relative_to(args.out))))
 
     with open(args.out / "split_manifest.csv", "w", newline="") as f:
         w = csv.writer(f)
@@ -133,10 +143,12 @@ def main() -> None:
         w.writerows(manifest_rows)
 
     print(f"{len(samples)} images -> {args.out}")
-    for split, items in splits.items():
-        counts = Counter(label for _, _, label in items)
-        ratio = counts["cracked"] / max(len(items), 1)
-        print(f"  {split:5s} {len(items):6d}  cracked={counts['cracked']:5d}  uncracked={counts['uncracked']:6d}  crack_ratio={ratio:.3f}")
+    counts = {split: Counter() for split in splits}
+    for split, label, *_ in manifest_rows:
+        counts[split][label] += 1
+    for split, c in counts.items():
+        n = c["cracked"] + c["uncracked"]
+        print(f"  {split:5s} {n:6d}  cracked={c['cracked']:5d}  uncracked={c['uncracked']:6d}  crack_ratio={c['cracked'] / max(n, 1):.3f}")
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@
       (SDNET2018 has no boxes, so mAP@0.5 is not measurable; F1 replaces it)
 - [x] First commit: data prep script + notebook
 - [x] Tune decision threshold — `scripts/tune_threshold.py`; recall 0.90 costs ~9× false alarms (see README)
-- [ ] Improve crack recall in the model: native 256px input (currently downscaled to 224), class-weighted loss
+- [ ] Improve crack recall in the model (notebook 02 runs the first two): native 256px input (currently downscaled to 224), class-weighted loss
       or oversampling cracked patches, try yolov8s-cls; inspect missed cracks for label noise
 
 ## v0.2 — Model Optimization
