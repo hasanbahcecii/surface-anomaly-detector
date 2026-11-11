@@ -45,5 +45,17 @@ Confusion matrix (rows = true, cols = predicted):
 | **cracked** | 940 | 331 |
 | **uncracked** | 99 | 7,043 |
 
-The model is precise but misses ~26% of cracked patches. For inspection, a missed crack costs more than a
-false alarm, so a lower decision threshold (trading precision for recall) is the first thing to tune.
+### Decision threshold
+
+Thresholds on P(cracked) are chosen on **val** and reported on **test** (`scripts/tune_threshold.py`).
+Val and test agree closely, so the chosen points generalize.
+
+| Operating point | Threshold | Test P | Test R | Test F1 | Missed cracks | False alarms |
+|---|---|---|---|---|---|---|
+| Argmax (default) | 0.500 | 0.905 | 0.740 | 0.814 | 331 | 99 |
+| F1-optimal | 0.465 | 0.894 | 0.748 | 0.815 | 320 | 113 |
+| High sensitivity (val recall ≥ 0.90) | 0.095 | 0.568 | 0.898 | 0.696 | 130 | 869 |
+
+Takeaway: a threshold alone can't buy recall cheaply. Reaching 90% recall cuts missed cracks from 331 to 130 but
+raises false alarms ~9× (99 → 869), because a quarter of the cracked patches get very low scores. Recall has to come
+from the model itself (see roadmap), not the threshold.

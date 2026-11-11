@@ -7,7 +7,9 @@
 - [x] Target: **cracked-class F1 > 0.75** on test — achieved **0.814** (P 0.905 / R 0.740)
       (SDNET2018 has no boxes, so mAP@0.5 is not measurable; F1 replaces it)
 - [x] First commit: data prep script + notebook
-- [ ] Tune decision threshold for higher crack recall — `scripts/tune_threshold.py` (notebook §7), awaiting Colab run
+- [x] Tune decision threshold — `scripts/tune_threshold.py`; recall 0.90 costs ~9× false alarms (see README)
+- [ ] Improve crack recall in the model: native 256px input (currently downscaled to 224), class-weighted loss
+      or oversampling cracked patches, try yolov8s-cls; inspect missed cracks for label noise
 
 ## v0.2 — Model Optimization
 - [ ] ONNX export
